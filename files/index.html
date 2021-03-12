@@ -1,0 +1,110 @@
+<title>Instructions</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora">
+<style>
+.hide {
+	display: block;
+	}
+.show {
+	display: none;
+	}
+body {
+  font-family: "Lora";
+}
+</style>
+<h1>Step 1:</h1>
+<p>Go to <a href="https://www.audible.com/library/titles" target="_blank">https://www.audible.com/library/titles</a> find the book you want to convert.</p>
+<img src="img/1.png">
+<h1>Step 2:</h1>
+<p>Meanwhile go to <a target="_blank" href="https://alniles.github.io/audible-mp3/decode/">https://alniles.github.io/audible-mp3/decode/</a></p>
+<h1>Step 3:</h1>
+<p>When the download finishes drag and drop (YOURBOOKNAME.aax) into the box.</p>
+<img src="img/2.png">
+<p>Then click on the (REQUEST ACTIVATION BYTES)</p>
+<h1>Step 4:</h1>
+<p>Copy the Activation Bytes</p>
+<img src="img/3.png">
+<p>Paste it here.</p>
+<input type="text" id="ab" maxlength="9" placeholder="Paste here">
+<h1>Step 5:</h1>
+<p>Pick a system you are using.</p>
+<select onchange="chang()" id="sys">
+  <option hidden>Pick one!</option>
+  <option value="mac">Mac</option>
+  <option value="win">Win</option>
+  <option value="linux">Linux</option>
+</select>
+<h1>Step 6:</h1>
+<p>Go to <a href="http://www.ffmpeg.org/download.html" target="_blank">http://www.ffmpeg.org/download.html</a> Download it for your operating system.</p>
+<p>Or</p>
+<div class="show">
+<div class="mac">
+	<p>Install brew</p>
+	<pre><code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></pre>
+	<p>Once Brew is installed or if it already is installed.</p>
+	<pre><code>$ brew install ffmpeg</code></pre>
+<h1>Step 7:</h1>
+	<p>Go to your downloads folder in Finder and open it with terminal.</p>
+</div>
+<div class="win">
+	<p>Go to <a href="https://www.wikihow.com/Install-FFmpeg-on-Windows" target="_blank">https://www.wikihow.com/Install-FFmpeg-on-Windows</a> For the instructions.</p>
+<h1>Step 7:</h1>
+	<p>Go to your downloads folder in File Explorer and open it with CMD (command prompt)</p>
+</div>
+<div class="linux">
+	<p>Install ffmpeg</p>
+	<pre><code>sudo apt update && sudo apt upgrade && sudo apt install ffmpeg && sudo apt update && sudo apt upgrade</code></pre>
+<h1>Step 7:</h1>
+	<p>Go to your downloads folder in your terminal or in your files app open it with your terminal.</p>
+</div>
+</div>
+<div class="hide">
+<p>Pick a system above.</p>
+<h1>Step 7:</h1>
+<p>Pick a system above.</p>
+	</div>
+<h1>Step 8:</h1>
+	<p>Enter an output format! example: '.mp3', '.wav' etc..</p><p>Include the dot at the begining.</p>
+<input type="text" id="file" placeholder="make sure it starts with a .">
+<h1>Step 9: (optional)</h1>
+<p>Split by chapter?</p>
+<input type="checkbox" id="y" value="yes">
+  <label for="y"> Yes</label><br>
+<h1>Step 10:</h1>
+<p>Rename the *.aax file to </p><pre><code>input.aax</code></pre>
+<div class="yy">
+<h1>Step 10 1/2:</h1>
+<p>Rename the *.aax file to </p>
+	<div>
+<h1>Step 11:</h1>
+<p>Copy this into the terminal or command prompt.</p>
+<input type="text" id="fin" readonly><button onclick="final()">Copy text to clipboard</button>
+<p>Note: This can take a long time depending on the size of the book!</p>
+<h1>All done!!!!!!!!!!!!!!!!</h1>
+<p>You can now delete (originalfile.aax)</p>
+<script>
+function chang(){
+	document.getElementsByClassName("hide")[0].setAttribute("style", "display: none;");
+	document.getElementsByClassName("show")[0].setAttribute("style", "display: block;");
+	var sy = document.getElementById("sys");
+	if (sy.selectedIndex == 1){
+		 document.getElementsByClassName("win")[0].setAttribute("style", "display: none;");
+		document.getElementsByClassName("linux")[0].setAttribute("style", "display: none;");
+	document.getElementsByClassName("mac")[0].setAttribute("style", "display: block;");
+	} else if (sy.selectedIndex == 2){
+		document.getElementsByClassName("mac")[0].setAttribute("style", "display: none;");
+		document.getElementsByClassName("linux")[0].setAttribute("style", "display: none;");
+	document.getElementsByClassName("win")[0].setAttribute("style", "display: block;");
+	} else if (sy.selectedIndex == 3){
+		document.getElementsByClassName("mac")[0].setAttribute("style", "display: none;");
+		document.getElementsByClassName("win")[0].setAttribute("style", "display: none;");
+	document.getElementsByClassName("linux")[0].setAttribute("style", "display: block;");
+	}
+	document.getElementById("fin").value = "Johnny Bravo";
+}
+	function final() {
+  var copyText = document.getElementById("fin");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand("copy");
+}
+</script>
