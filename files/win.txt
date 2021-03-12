@@ -1,0 +1,37 @@
+echo: Starting...
+echo: Making folder 'files'
+mkdir files
+echo: Starting Extraction!
+ffmpeg -activation_bytes 734aa007 -i input.aax -c copy files/output.mp4
+echo: Extraction successful!
+echo: Converting to .mp3!
+ffmpeg -activation_bytes 734aa007 -i files/output.mp4 -vn 'Your Book!.mp3'
+echo: Finishing up!
+echo: Say yes to remove catched files
+rename input.aax originalfile.aax
+rmdir /S files
+echo: All Done!!!
+
+
+
+echo: Starting... && echo: Making folder 'files' && mkdir files && echo: Starting Extraction! && ffmpeg -activation_bytes 734aa007 -i input.aax -c copy files/output.mp4 && echo: Extraction successful! && echo: Converting to .mp3! && ffmpeg -activation_bytes 734aa007 -i files/output.mp4 -vn 'Your Book!.mp3' && echo: Finishing up! && echo: Say yes to remove catched files && rename input.aax originalfile.aax && rmdir /S files && echo: All Done!!!
+
+
+
+echo: Starting...
+echo: Making folder 'files'
+mkdir files
+mkdir chapters
+move cut.bat chapters
+echo: Starting Extraction!
+ffmpeg -activation_bytes 734aa007 -i input.aax -c copy files/output.mp4
+echo: Extraction successful!
+echo: Converting to .mp3!
+ffmpeg -activation_bytes 734aa007 -i files/output.mp4 -vn files/'Your Book!.mp3'
+chapters/cut.bat
+echo: Finishing up!
+echo: Say yes to remove catched files
+rename input.aax originalfile.aax
+del /f chapters/cut.bat
+rmdir /S files
+echo: All Done!!!
