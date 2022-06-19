@@ -284,7 +284,7 @@ echo "Not a valid option"
 option_5_r "${s1n[@]}" $2
 fi
 }
-function run_ffmpeg (){
+function run_ffmpeg () {
 if [ $1 = "one" ]
 then
 fline=$2
@@ -292,8 +292,10 @@ factive=$3
 ftype=$4
 fme=$5
 ffmpeg=""
-if [ ! -d "audibletomp3" ]; then
+if [ ! -d "audibletomp3" ];
+then
   $(mkdir audibletomp3)
+fi
 fffile="$(sed -n $fline'p' /tmp/audibletomp3.XXXXXX)"
 	ffprobe -v quiet -show_chapters -print_format json -show_format "$fffile" &> /tmp/audibletomp3F.XXXXXX < /dev/null
 	thejsonff="$(jq '.format.tags.title' /tmp/audibletomp3F.XXXXXX)"
@@ -323,12 +325,15 @@ f2=4
 	f1=$(($f1+2))
 	f2=$(($f2+2))
 	done
+f2=$(($f2-1))
+ftype='$'"${f2}"
+eval ftype=${ftype}
 f2=$(($f2+1))
-eval ftype='$'"${f2}"
-f2=$(($f2+1))
-eval fme='$'"${f2}"
+fme='$'"${f2}"
+eval fme=${fme}
 ffmpeg=""
-if [ ! -d "audibletomp3" ]; then
+if [ ! -d "audibletomp3" ];
+then
   $(mkdir audibletomp3)
 fi
 	for (( i=0; i<$fnum; i++))
