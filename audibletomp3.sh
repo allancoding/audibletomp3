@@ -1,8 +1,9 @@
 #! /bin/bash -e
-tmpfilef=$(mktemp /tmp/audibletomp3.XXXXXX)
 $(ls / > /tmp/audibletomp3.XXXXXX)
+$(ls / > /tmp/audibletomp3F.XXXXXX)
 cleanup () {
   rm /tmp/audibletomp3.XXXXXX
+  rm /tmp/audibletomp3F.XXXXXX
 }
 trap cleanup EXIT
 start_audible () {
@@ -107,7 +108,7 @@ echo "4. Exit"
 option_4 () {
   echo "Select Format:"
 echo "1. mp3"
-echo "2. wav"
+echo "2. ogg"
 echo "3. m4a"
 echo "4. Exit"
 }
@@ -224,7 +225,7 @@ then
 		then
 		start_audible
 		option_5
-		option_5_r "${s1n[@]}" "wav"
+		option_5_r "${s1n[@]}" "ogg"
 		fi
 		if [ $OPTION4 = 3 ]
 		then
@@ -290,6 +291,23 @@ fline=$2
 factive=$3
 ftype=$4
 fme=$5
+ffmpeg=""
+if [ ! -d "audibletomp3" ]; then
+  $(mkdir audibletomp3)
+fffile="$(sed -n $fline'p' /tmp/audibletomp3.XXXXXX)"
+	ffprobe -v quiet -show_chapters -print_format json -show_format "$fffile" &> /tmp/audibletomp3F.XXXXXX < /dev/null
+	thejsonff="$(jq '.format.tags.title' /tmp/audibletomp3F.XXXXXX)"
+	if [ $fme = "o" ]
+	then
+	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype"
+	elif [ $fme = "c" ]
+	then
+	ffmpeg="Hii"
+	elif [ $fme = "t" ]
+	then
+	ffmpeg="Hii"
+	fi
+	echo "$ffmpeg"
 elif [ $1 = "all" ]
 then
 fnum=$2
@@ -310,6 +328,9 @@ eval ftype='$'"${f2}"
 f2=$(($f2+1))
 eval fme='$'"${f2}"
 ffmpeg=""
+if [ ! -d "audibletomp3" ]; then
+  $(mkdir audibletomp3)
+fi
 	for (( i=0; i<$fnum; i++))
 	do
 	ffnum=$(($i + 1))
@@ -320,14 +341,20 @@ ffmpeg=""
 	ffline="$ffline"
 	ffactive="$ffactive"
 	fffile="$(sed -n $ffline'p' /tmp/audibletomp3.XXXXXX)"
-	fffile="'$fffile'"
-	tmpfilef2=$(mktemp /tmp/audibletomp3.FXXXXX)
-	thejsonffname="$(ffprobe -v quiet -show_chapters -print_format json -show_format $fffile | jq '.format.tags.title'
-)"
-echo "$thejsonffname"
-	ffmpeg="ffmpeg -activation_bytes $ffactive -i $fffile -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $ffactive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.mp3 && rm /tmp/audibletomp3.FXXXXX.mp4 && mkdir audibletomp3 && mv /tmp/audibletomp3.FXXXXX.mp3 audibletomp3/'$thejsonffname.mp3'"
-	done
+	ffprobe -v quiet -show_chapters -print_format json -show_format "$fffile" &> /tmp/audibletomp3F.XXXXXX < /dev/null
+	thejsonff="$(jq '.format.tags.title' /tmp/audibletomp3F.XXXXXX)"
+	if [ $fme = "o" ]
+	then
+	ffmpeg="ffmpeg -activation_bytes $ffactive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $ffactive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $ffactive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype"
+	elif [ $fme = "c" ]
+	then
+	ffmpeg="Hii"
+	elif [ $fme = "t" ]
+	then
+	ffmpeg="Hii"
+	fi
 	echo "$ffmpeg"
+	done
 fi
 }
 function option_6_r () {
