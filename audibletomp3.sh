@@ -376,7 +376,7 @@ fffile="$(sed -n $fline'p' /tmp/audibletomp3.XXXXXX)"
 	thejsonffy="$(echo $thejsonff | tr -d '"')"
 	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png && ffmpeg -i audibletomp3/$thejsonff/$thejsonff.$ftype -f segment -segment_start_number 1 -segment_time $fctime -c copy audibletomp3/$thejsonff/'%0"$thejsonnumberofd3"d. $thejsonffy'.$ftype && rm audibletomp3/$thejsonff/$thejsonff.$ftype"
 	fi
-	echo "$ffmpeg"
+	eval "$ffmpeg"
 elif [ $1 = "all" ]
 then
 fnum=$2
@@ -492,9 +492,9 @@ fi
 	thejsonnumberofd2=${thejsonffallt2%.*}
 	thejsonnumberofd3=${#thejsonnumberofd2}
 	thejsonffy="$(echo $thejsonff | tr -d '"')"
-	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png && ffmpeg -i audibletomp3/$thejsonff/$thejsonff.$ftype -f segment -segment_start_number 1 -segment_time $fctime -c copy audibletomp3/$thejsonff/'%0"$thejsonnumberofd3"d. $thejsonffy'.$ftype && rm audibletomp3/$thejsonff/$thejsonff.$ftype"
+	ffmpeg="ffmpeg -activation_bytes $ffactive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $ffactive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $ffactive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png && ffmpeg -i audibletomp3/$thejsonff/$thejsonff.$ftype -f segment -segment_start_number 1 -segment_time $fctime -c copy audibletomp3/$thejsonff/'%0"$thejsonnumberofd3"d. $thejsonffy'.$ftype && rm audibletomp3/$thejsonff/$thejsonff.$ftype"
 	fi
-	echo "$ffmpeg"
+	eval "$ffmpeg"
 	done
 	printf '%.s─' $(seq 1 $(tput cols))
 	echo "All Done!!!!!!!!!!!!"
