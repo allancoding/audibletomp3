@@ -17,8 +17,9 @@ echo "╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝
 printf '%.s─' $(seq 1 $(tput cols))
 }
 get_activebit () {
-IPb=$(curl -s https://aax.api.j-kit.me/api/v1/activation/$1)
-echo "$IPb"
+#IPb=$(curl -s https://aax.api.j-kit.me/api/v1/activation/$1)
+#echo "$IPb"
+echo "734aa007"
 }
 get_checkbit () {
 IPb1=$(od --address-radix=none --read-bytes=20 --skip-bytes=0x28d --format=x1 --endian=big --width=20 "$1" | tr -d ' ')
@@ -301,13 +302,79 @@ fffile="$(sed -n $fline'p' /tmp/audibletomp3.XXXXXX)"
 	thejsonff="$(jq '.format.tags.title' /tmp/audibletomp3F.XXXXXX)"
 	if [ $fme = "o" ]
 	then
-	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype"
+	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png"
 	elif [ $fme = "c" ]
 	then
-	ffmpeg="Hii"
+	thejsonffy="$(echo $thejsonff | tr -d '"')"
+	if [ ! -d "audibletomp3/$thejsonffy" ];
+	then
+  	$(mkdir "audibletomp3/$thejsonffy")
+	fi
+	thejsonffccn="$(jq '.chapters' /tmp/audibletomp3F.XXXXXX | jq -r length )"
+	thejsonffccn=$(($thejsonffccn + 1))
+	thejsonffccn2=$(($thejsonffccn - 1))
+	ffmpeg1=""
+	numdig=${#thejsonffccn2}
+	for (( i=0; i<$thejsonffccn2; i++))
+	do
+	thejsonffccst="$(jq ".chapters[$i].start_time" /tmp/audibletomp3F.XXXXXX | tr -d '"')"
+	thejsonffccet="$(jq ".chapters[$i].end_time" /tmp/audibletomp3F.XXXXXX | tr -d '"')"
+	thejsonffcctt2="$(jq ".chapters[$i].tags.title" /tmp/audibletomp3F.XXXXXX | tr -d -c 0-9)"
+	if [ $numdig = 1 ]
+	then
+	thejsonffcctt2="$thejsonffcctt2. "
+	elif [ $numdig = 2 ]
+	then
+		if [ ${#thejsonffcctt2} = 1 ]
+		then
+		thejsonffcctt2="0$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 2 ]
+		then
+		thejsonffcctt2="$thejsonffcctt2. "
+		fi
+	elif [ $numdig = 3 ]
+	then
+		if [ ${#thejsonffcctt2} = 1 ]
+		then
+		thejsonffcctt2="00$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 2 ]
+		then
+		thejsonffcctt2="0$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 3 ]
+		then
+		thejsonffcctt2="$thejsonffcctt2. "
+		fi
+	elif [ $numdig = 4 ]
+	then
+		if [ ${#thejsonffcctt2} = 1 ]
+		then
+		thejsonffcctt2="000$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 2 ]
+		then
+		thejsonffcctt2="00$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 3 ]
+		then
+		thejsonffcctt2="0$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 4 ]
+		then
+		thejsonffcctt2="$thejsonffcctt2. "
+		fi
+	fi
+	ffmpeg1="$ffmpeg1 && ffmpeg -ss $thejsonffccst -to $thejsonffccet -i audibletomp3/$thejsonff/$thejsonff.$ftype -c copy 'audibletomp3/$thejsonff/$thejsonffcctt2$thejsonffy.$ftype'"
+	done
+	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png$ffmpeg1 && rm audibletomp3/$thejsonff/$thejsonff.$ftype"
 	elif [ $fme = "t" ]
 	then
-	ffmpeg="Hii"
+	fctime=$6
+	fctime=$(($fctime + 0))
+	thejsonffallt="$(jq ".format.duration" /tmp/audibletomp3F.XXXXXX | tr -d '"')"
+	thejsonnumberofd=${thejsonffallt%.*}
+	thejsonffallt=$(($thejsonnumberofd + 1))
+	thejsonffallt2=$(($thejsonffallt / $fctime))
+	thejsonnumberofd2=${thejsonffallt2%.*}
+	thejsonnumberofd3=${#thejsonnumberofd2}
+	thejsonffy="$(echo $thejsonff | tr -d '"')"
+	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png && ffmpeg -i audibletomp3/$thejsonff/$thejsonff.$ftype -f segment -segment_start_number 1 -segment_time $fctime -c copy audibletomp3/$thejsonff/'%0"$thejsonnumberofd3"d. $thejsonffy'.$ftype && rm audibletomp3/$thejsonff/$thejsonff.$ftype"
 	fi
 	echo "$ffmpeg"
 elif [ $1 = "all" ]
@@ -331,7 +398,11 @@ eval ftype=${ftype}
 f2=$(($f2+1))
 fme='$'"${f2}"
 eval fme=${fme}
+f2=$(($f2+1))
+fctime='$'"${f2}"
+eval fctime=${fctime}
 ffmpeg=""
+ffmpeg1=""
 if [ ! -d "audibletomp3" ];
 then
   $(mkdir audibletomp3)
@@ -350,16 +421,83 @@ fi
 	thejsonff="$(jq '.format.tags.title' /tmp/audibletomp3F.XXXXXX)"
 	if [ $fme = "o" ]
 	then
-	ffmpeg="ffmpeg -activation_bytes $ffactive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $ffactive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $ffactive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype"
+	ffmpeg="ffmpeg -activation_bytes $ffactive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $ffactive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $ffactive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png"
 	elif [ $fme = "c" ]
 	then
-	ffmpeg="Hii"
+	thejsonffy="$(echo $thejsonff | tr -d '"')"
+	if [ ! -d "audibletomp3/$thejsonffy" ];
+	then
+  	$(mkdir "audibletomp3/$thejsonffy")
+	fi
+	thejsonffccn="$(jq '.chapters' /tmp/audibletomp3F.XXXXXX | jq -r length )"
+	thejsonffccn=$(($thejsonffccn + 1))
+	thejsonffccn2=$(($thejsonffccn - 1))
+	ffmpeg1=""
+	numdig=${#thejsonffccn2}
+	for (( ii=0; ii<$thejsonffccn2; ii++))
+	do
+	thejsonffccst="$(jq ".chapters[$ii].start_time" /tmp/audibletomp3F.XXXXXX | tr -d '"')"
+	thejsonffccet="$(jq ".chapters[$ii].end_time" /tmp/audibletomp3F.XXXXXX | tr -d '"')"
+	thejsonffcctt2="$(jq ".chapters[$ii].tags.title" /tmp/audibletomp3F.XXXXXX | tr -d -c 0-9)"
+	if [ $numdig = 1 ]
+	then
+	thejsonffcctt2="$thejsonffcctt2. "
+	elif [ $numdig = 2 ]
+	then
+		if [ ${#thejsonffcctt2} = 1 ]
+		then
+		thejsonffcctt2="0$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 2 ]
+		then
+		thejsonffcctt2="$thejsonffcctt2. "
+		fi
+	elif [ $numdig = 3 ]
+	then
+		if [ ${#thejsonffcctt2} = 1 ]
+		then
+		thejsonffcctt2="00$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 2 ]
+		then
+		thejsonffcctt2="0$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 3 ]
+		then
+		thejsonffcctt2="$thejsonffcctt2. "
+		fi
+	elif [ $numdig = 4 ]
+	then
+		if [ ${#thejsonffcctt2} = 1 ]
+		then
+		thejsonffcctt2="000$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 2 ]
+		then
+		thejsonffcctt2="00$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 3 ]
+		then
+		thejsonffcctt2="0$thejsonffcctt2. "
+		elif [ ${#thejsonffcctt2} = 4 ]
+		then
+		thejsonffcctt2="$thejsonffcctt2. "
+		fi
+	fi
+	ffmpeg1="$ffmpeg1 && ffmpeg -ss $thejsonffccst -to $thejsonffccet -i audibletomp3/$thejsonff/$thejsonff.$ftype -c copy 'audibletomp3/$thejsonff/$thejsonffcctt2$thejsonffy.$ftype'"
+	done
+	ffmpeg="ffmpeg -activation_bytes $ffactive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $ffactive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $ffactive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png$ffmpeg1 && rm audibletomp3/$thejsonff/$thejsonff.$ftype"
 	elif [ $fme = "t" ]
 	then
-	ffmpeg="Hii"
+	fctime=$(($fctime + 0))
+	thejsonffallt="$(jq ".format.duration" /tmp/audibletomp3F.XXXXXX | tr -d '"')"
+	thejsonnumberofd=${thejsonffallt%.*}
+	thejsonffallt=$(($thejsonnumberofd + 1))
+	thejsonffallt2=$(($thejsonffallt / $fctime))
+	thejsonnumberofd2=${thejsonffallt2%.*}
+	thejsonnumberofd3=${#thejsonnumberofd2}
+	thejsonffy="$(echo $thejsonff | tr -d '"')"
+	ffmpeg="ffmpeg -activation_bytes $factive -i '"$fffile"' -c copy /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -activation_bytes $factive -i '"$fffile"' -map 0:v -map -0:V -c copy /tmp/audibletomp3.FXXXXX.png && ffmpeg -activation_bytes $factive -i /tmp/audibletomp3.FXXXXX.mp4 -vn /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.mp4 && ffmpeg -i /tmp/audibletomp3.FXXXXX.$ftype -i /tmp/audibletomp3.FXXXXX.png -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title='Audiobook cover' -metadata:s:v comment='Cover (front)' audibletomp3/$thejsonff/$thejsonff.$ftype && rm /tmp/audibletomp3.FXXXXX.$ftype && rm /tmp/audibletomp3.FXXXXX.png && ffmpeg -i audibletomp3/$thejsonff/$thejsonff.$ftype -f segment -segment_start_number 1 -segment_time $fctime -c copy audibletomp3/$thejsonff/'%0"$thejsonnumberofd3"d. $thejsonffy'.$ftype && rm audibletomp3/$thejsonff/$thejsonff.$ftype"
 	fi
 	echo "$ffmpeg"
 	done
+	printf '%.s─' $(seq 1 $(tput cols))
+	echo "All Done!!!!!!!!!!!!"
 fi
 }
 function option_6_r () {
@@ -372,22 +510,22 @@ then
 		if [ $OPTION6 = 1 ]
 		then
 		start_audible
-		run_ffmpeg "${s1n[@]}" 5
+		run_ffmpeg "${s1n[@]}" 300
 		fi
 		if [ $OPTION6 = 2 ]
 		then
 		start_audible
-		run_ffmpeg "${s1n[@]}" 10
+		run_ffmpeg "${s1n[@]}" 600
 		fi
 		if [ $OPTION6 = 3 ]
 		then
 		start_audible
-		run_ffmpeg "${s1n[@]}" 30
+		run_ffmpeg "${s1n[@]}" 1800
 		fi
 		if [ $OPTION6 = 4 ]
 		then
 		start_audible
-		run_ffmpeg "${s1n[@]}" 1
+		run_ffmpeg "${s1n[@]}" 3600
 		fi
 		if [ $OPTION6 = 5 ]
 		then
