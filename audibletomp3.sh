@@ -17,9 +17,8 @@ echo "╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝
 printf '%.s─' $(seq 1 $(tput cols))
 }
 get_activebit () {
-#IPb=$(curl -s https://aax.api.j-kit.me/api/v1/activation/$1)
-#echo "$IPb"
-echo "734aa007"
+IPb=$(curl -s https://aax.api.j-kit.me/api/v1/activation/$1)
+echo "$IPb"
 }
 get_checkbit () {
 IPb1=$(od --address-radix=none --read-bytes=20 --skip-bytes=0x28d --format=x1 --endian=big --width=20 "$1" | tr -d ' ')
