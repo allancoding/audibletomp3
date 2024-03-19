@@ -33,7 +33,7 @@ echo " "
 echo "© Allancoding"
 }
 list_files_aax () {
-  $(find /home /mnt /media -name *.aax -print > /tmp/audibletomp3.XXXXXX)
+  $(find ./ -name *.aax* -print > /tmp/audibletomp3.XXXXXX)
   ffnum=1
   ffnumf=$(wc -l /tmp/audibletomp3.XXXXXX | awk '{ print $1 }')
   if [ $ffnumf = 0 ] 
